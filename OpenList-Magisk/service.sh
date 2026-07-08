@@ -250,23 +250,31 @@ if [ ! -w "$DATA_DIR" ]; then
 fi
 log "已创建或验证数据目录：$DATA_DIR"
 
-MODULE_BIN="/data/adb/openlist/bin"
+# ==================================================
+# FFmpeg 自动检测
+# ==================================================
+
+MODULE_BIN="$(dirname "$OPENLIST_BINARY")"
 TERMUX_BIN="/data/data/com.termux/files/usr/bin"
 
+# 默认把模块目录加入 PATH
+export PATH="$MODULE_BIN:$PATH"
+
 if [ -x "$MODULE_BIN/ffmpeg" ] && [ -x "$MODULE_BIN/ffprobe" ]; then
-    export PATH="$MODULE_BIN:$PATH"
-    log "使用模块内置 FFmpeg"
+    log "检测到模块内置 FFmpeg"
 
 elif [ -x "$TERMUX_BIN/ffmpeg" ] && [ -x "$TERMUX_BIN/ffprobe" ]; then
     export PATH="$TERMUX_BIN:$PATH"
-    log "使用 Termux FFmpeg"
+    log "检测到 Termux FFmpeg"
 
 else
-    log "未找到 FFmpeg，视频缩略图不可用"
+    log "未检测到 FFmpeg，视频缩略图功能不可用"
 fi
 
-log "ffmpeg: $(command -v ffmpeg 2>/dev/null || echo 'Not Found')"
-log "ffprobe: $(command -v ffprobe 2>/dev/null || echo 'Not Found')"
+log "PATH=$PATH"
+log "当前 ffmpeg: $(command -v ffmpeg 2>/dev/null || echo 'Not Found')"
+log "当前 ffprobe: $(command -v ffprobe 2>/dev/null || echo 'Not Found')"
+
 
 ELAPSED=0
 MAX_WAIT=60
